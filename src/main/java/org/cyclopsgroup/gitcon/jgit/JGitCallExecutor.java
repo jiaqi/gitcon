@@ -38,7 +38,7 @@ abstract class JGitCallExecutor
         @Override
         protected void configure( OpenSshConfig.Host host, Session session )
         {
-            session.setConfig( "StrictHostKeyChecking", "yes" );
+            session.setConfig( "StrictHostKeyChecking", "no" );
         }
 
         @Override
