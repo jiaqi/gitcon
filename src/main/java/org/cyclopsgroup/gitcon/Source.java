@@ -4,7 +4,7 @@ import java.io.File;
 
 public interface Source
 {
-    void initWorkingDirectory( File workingDirectory )
+    File initWorkingDirectory( File workingDirectory )
         throws Exception;
 
     void updateWorkingDirectory( File workingDirectory )

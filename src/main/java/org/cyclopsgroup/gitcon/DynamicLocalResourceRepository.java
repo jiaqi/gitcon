@@ -52,8 +52,7 @@ public class DynamicLocalResourceRepository
         }
     };
 
-    protected DynamicLocalResourceRepository( File workingDir,
-                                            Source source )
+    protected DynamicLocalResourceRepository( File workingDir, Source source )
     {
         super( workingDir, source );
     }

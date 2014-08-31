@@ -45,6 +45,7 @@ public class DynamicLocalResourceRepositoryTest
         {
             {
                 oneOf( source ).initWorkingDirectory( workingDirectory );
+
                 atLeast( 1 ).of( source ).updateWorkingDirectory( workingDirectory );
             }
         } );

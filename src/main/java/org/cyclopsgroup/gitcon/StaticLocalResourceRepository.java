@@ -32,6 +32,8 @@ public class StaticLocalResourceRepository
 
     private final File workingDirectory;
 
+    private File sourceDirectory;
+
     private final Source source;
 
     public StaticLocalResourceRepository( Source source )
@@ -40,8 +42,7 @@ public class StaticLocalResourceRepository
 
     }
 
-    public StaticLocalResourceRepository( File directory,
-                                        Source source )
+    public StaticLocalResourceRepository( File directory, Source source )
     {
         this.workingDirectory = directory;
         this.source = source;
@@ -76,7 +77,7 @@ public class StaticLocalResourceRepository
             LOG.info( "Made local temporary directory " + workingDirectory );
         }
 
-        source.initWorkingDirectory( workingDirectory );
+        sourceDirectory = source.initWorkingDirectory( workingDirectory );
 
         File[] dirs =
             workingDirectory.listFiles( (FileFilter) FileFilterUtils.directoryFileFilter() );
@@ -93,7 +94,7 @@ public class StaticLocalResourceRepository
     public Reader openToRead( String filePath )
         throws IOException
     {
-        return new FileReader( new File( workingDirectory
+        return new FileReader( new File( sourceDirectory
             + SystemUtils.FILE_SEPARATOR + filePath ) );
     }
 

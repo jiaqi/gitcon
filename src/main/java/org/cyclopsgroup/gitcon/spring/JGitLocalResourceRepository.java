@@ -8,6 +8,8 @@ import java.io.Reader;
 import org.cyclopsgroup.gitcon.ResourceRepository;
 import org.cyclopsgroup.gitcon.StaticLocalResourceRepository;
 import org.cyclopsgroup.gitcon.jgit.JGitSource;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * A convenient class that combines {@link JGitSource} and
@@ -15,7 +17,7 @@ import org.cyclopsgroup.gitcon.jgit.JGitSource;
  */
 public class JGitLocalResourceRepository
     extends JGitSource
-    implements Closeable, ResourceRepository
+    implements Closeable, ResourceRepository, InitializingBean, DisposableBean
 {
     private final StaticLocalResourceRepository localRepo;
 
@@ -33,7 +35,21 @@ public class JGitLocalResourceRepository
     }
 
     @Override
+    public void afterPropertiesSet()
+        throws Exception
+    {
+        localRepo.init();
+    }
+
+    @Override
     public void close()
+        throws IOException
+    {
+        localRepo.close();
+    }
+
+    @Override
+    public void destroy()
         throws IOException
     {
         localRepo.close();

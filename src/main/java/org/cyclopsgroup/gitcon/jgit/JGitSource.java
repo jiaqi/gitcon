@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
@@ -56,7 +57,7 @@ public class JGitSource
         return branchOrCommit;
     }
 
-    public void initWorkingDirectory( File workingDirectory )
+    public File initWorkingDirectory( File workingDirectory )
         throws GitAPIException, IOException
     {
         // Create git repo local directory
@@ -71,7 +72,7 @@ public class JGitSource
         // Create local file for build-in SSH private key
         File sshKey = null;
         if ( buildInSshIdentityUsed == Boolean.TRUE
-            || sshIdentity.equalsIgnoreCase( "buildin" ) )
+            || StringUtils.equalsIgnoreCase( sshIdentity, "buildin" ) )
         {
             sshKey =
                 new File( workingDirectory.getAbsolutePath()
@@ -81,9 +82,15 @@ public class JGitSource
             LOG.info( "Build-in SSH private key is copied into " + sshKey );
 
         }
-        else if ( !sshIdentity.equalsIgnoreCase( "default" ) )
+        else if ( sshIdentity != null
+            && !sshIdentity.equalsIgnoreCase( "default" ) )
         {
             sshKey = new File( sshIdentity );
+            LOG.info( "About to use specified SSH key " + sshIdentity );
+        }
+        else
+        {
+            LOG.info( "Default system SSH key will apply" );
         }
 
         if ( sshKey == null )
@@ -137,6 +144,7 @@ public class JGitSource
             } );
             LOG.info( "Git checkout returned " + result );
         }
+        return sourceDirectory;
     }
 
     public void setBranchOrCommit( String branch )
