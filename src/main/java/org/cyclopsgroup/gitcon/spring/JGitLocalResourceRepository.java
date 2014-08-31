@@ -3,7 +3,6 @@ package org.cyclopsgroup.gitcon.spring;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 
 import org.cyclopsgroup.gitcon.ResourceRepository;
 import org.cyclopsgroup.gitcon.StaticLocalResourceRepository;
@@ -34,6 +33,9 @@ public class JGitLocalResourceRepository
             new StaticLocalResourceRepository( workingDirectory, this );
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void afterPropertiesSet()
         throws Exception
@@ -41,6 +43,9 @@ public class JGitLocalResourceRepository
         localRepo.init();
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void close()
         throws IOException
@@ -48,6 +53,9 @@ public class JGitLocalResourceRepository
         localRepo.close();
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void destroy()
         throws IOException
@@ -55,10 +63,12 @@ public class JGitLocalResourceRepository
         localRepo.close();
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
-    public Reader openToRead( String filePath )
-        throws IOException
+    public File getResource( String filePath )
     {
-        return localRepo.openToRead( filePath );
+        return localRepo.getResource( filePath );
     }
 }

@@ -3,9 +3,7 @@ package org.cyclopsgroup.gitcon;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -91,11 +89,10 @@ public class StaticLocalResourceRepository
      * @inheritDoc
      */
     @Override
-    public Reader openToRead( String filePath )
-        throws IOException
+    public File getResource( String filePath )
     {
-        return new FileReader( new File( sourceDirectory
-            + SystemUtils.FILE_SEPARATOR + filePath ) );
+        return new File( sourceDirectory + SystemUtils.FILE_SEPARATOR
+            + filePath );
     }
 
     private void wipeWorkingDir()

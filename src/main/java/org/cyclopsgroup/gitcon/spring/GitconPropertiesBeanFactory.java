@@ -1,10 +1,13 @@
 package org.cyclopsgroup.gitcon.spring;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
+import java.util.Iterator;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.collections.ExtendedProperties;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.cyclopsgroup.gitcon.ResourceRepository;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -16,6 +19,9 @@ import org.springframework.beans.factory.FactoryBean;
 public class GitconPropertiesBeanFactory
     implements FactoryBean<Properties>
 {
+    private static final Log LOG =
+        LogFactory.getLog( GitconPropertiesBeanFactory.class );
+
     private final String filePath;
 
     private final ResourceRepository repo;
@@ -33,21 +39,22 @@ public class GitconPropertiesBeanFactory
     /**
      * @inheritDoc
      */
+    @SuppressWarnings( "unchecked" )
     @Override
     public Properties getObject()
         throws IOException
     {
-        Properties props = new Properties();
-        Reader in = repo.openToRead( filePath );
-        try
+        File file = repo.getResource( filePath );
+        LOG.info( "Reading extended properties from file " + file );
+        ExtendedProperties props =
+            new ExtendedProperties( file.getAbsolutePath() );
+        Properties p = new Properties();
+        for ( Iterator<String> i = props.getKeys(); i.hasNext(); )
         {
-            props.load( in );
-            return props;
+            String key = i.next();
+            p.setProperty( key, props.getString( key ) );
         }
-        finally
-        {
-            IOUtils.closeQuietly( in );
-        }
+        return p;
     }
 
     /**

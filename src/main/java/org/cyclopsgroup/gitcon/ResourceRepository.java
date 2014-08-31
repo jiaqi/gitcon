@@ -1,10 +1,8 @@
 package org.cyclopsgroup.gitcon;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.io.File;
 
 public interface ResourceRepository
 {
-    Reader openToRead( String filePath )
-        throws IOException;
+    File getResource( String filePath );
 }
