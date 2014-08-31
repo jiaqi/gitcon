@@ -27,12 +27,13 @@ public class JGitSource
 
     private volatile String branchOrCommit;
 
+    private String sshIdentity;
+
     private Boolean buildInSshIdentityUsed;
 
     private CredentialsProvider credentialsProvider;
 
-    private JGitCallExecutor executor =
-        JGitCallExecutor.synchronize( JGitCallExecutor.direct() );
+    private JGitCallExecutor executor;
 
     private Git git;
 
@@ -68,15 +69,35 @@ public class JGitSource
         }
 
         // Create local file for build-in SSH private key
-        if ( buildInSshIdentityUsed == Boolean.TRUE )
+        File sshKey = null;
+        if ( buildInSshIdentityUsed == Boolean.TRUE
+            || sshIdentity.equalsIgnoreCase( "buildin" ) )
         {
-            File sshKey =
+            sshKey =
                 new File( workingDirectory.getAbsolutePath()
                     + SystemUtils.FILE_SEPARATOR + "gitconreader-ssh.key" );
             FileUtils.copyURLToFile( getClass().getClassLoader().getResource( "META-INF/gitcon/gitconreader-ssh.key" ),
                                      sshKey );
             LOG.info( "Build-in SSH private key is copied into " + sshKey );
-            this.executor =
+
+        }
+        else if ( !sshIdentity.equalsIgnoreCase( "default" ) )
+        {
+            sshKey = new File( sshIdentity );
+        }
+
+        if ( sshKey == null )
+        {
+            executor = JGitCallExecutor.synchronize( JGitCallExecutor.direct() );
+        }
+        else if ( !sshKey.canRead() )
+        {
+            throw new IllegalStateException( "Configured SSH private key "
+                + sshKey + " is not accessible" );
+        }
+        else
+        {
+            executor =
                 JGitCallExecutor.withSshPrivateKey( sshKey.getAbsolutePath() );
             LOG.info( "JGit executor is set with build-in SSH key " + sshKey );
         }
@@ -130,18 +151,13 @@ public class JGitSource
 
     public void setSshIdentity( String privateKeyPath )
     {
-        if ( buildInSshIdentityUsed == Boolean.TRUE )
-        {
-            throw new IllegalStateException(
-                                             "Build-in identity is used, so no other identity is required." );
-        }
-        this.executor = JGitCallExecutor.withSshPrivateKey( privateKeyPath );
-        LOG.info( "JGit executor is set with SSH private key " + privateKeyPath );
+        this.sshIdentity = privateKeyPath;
     }
 
     public void setSshIdentityFile( File privateKeyFile )
     {
-        setSshIdentity( privateKeyFile.getAbsolutePath() );
+        setSshIdentity( privateKeyFile == null ? null
+                        : privateKeyFile.getAbsolutePath() );
     }
 
     public void setUserPassword( String userAndPassword )
