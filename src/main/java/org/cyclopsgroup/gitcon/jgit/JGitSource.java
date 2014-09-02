@@ -19,7 +19,27 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 /**
- * Implementation of {@link Source} based on a local git repository
+ * Implementation of {@link Source} that gets file from a Git repository. There
+ * are several ways of authenticating access to git.
+ * <ol>
+ * <li>Username and password is supported, but it's the least recommended
+ * approach. User can call {@link JGitSource#setUserPassword(String, String)} or
+ * {@link JGitSource#setUserPassword(String)} to pass username and password to
+ * the instance.</li>
+ * <li>If the OS default SSH for current run-as-user is good to access Git repo,
+ * nothing needs to be configured and default setting will pick up system SSH
+ * key in {@literal $user.home/.ssh/}.</li>
+ * <li>Specify an SSH private key by calling
+ * {@link JGitSource#setSshIdentity(String)} or
+ * {@link JGitSource#setSshIdentityFile(File)}</li>
+ * <li>Gitcon library comes with a build-in SSH private key for user
+ * {@literal gitconreader} in both Github and BitBucket. Calling
+ * {@link JGitSource#setBuildInSshIdentityUsed(boolean)} with {@literal true} or
+ * {@link JGitSource#setSshIdentity(String)} with {@literal buildin} tells the
+ * class to use the build-in private key. Beaware that since everyone can get
+ * this build-in private key from Gitcon jar file, exposing your Git repo to
+ * user {@literal gitconreader} is equivalent to exposing it to public.</li>
+ * </ol>
  */
 public class JGitSource
     implements Source
@@ -57,6 +77,10 @@ public class JGitSource
         return branchOrCommit;
     }
 
+    /**
+     * @inheritDoc
+     */
+    @Override
     public File initWorkingDirectory( File workingDirectory )
         throws GitAPIException, IOException
     {
@@ -147,27 +171,64 @@ public class JGitSource
         return sourceDirectory;
     }
 
+    /**
+     * Caller sets branchOrCommit in order to checkout files from a non-default
+     * branch or specified commit. When specified, a {@literal git checkout}
+     * command will be called right after {@literal git clone} when application
+     * starts.
+     *
+     * @param branch Branch or commit in Git repository
+     */
     public void setBranchOrCommit( String branch )
     {
         this.branchOrCommit = branch;
     }
 
+    /**
+     * Gitcon jar file comes with a build-in SSH private key for user
+     * {@literal gitconreader} in both Github and BitBucket. This method tells
+     * {@link JGitSource} to use the build-in SSH key.
+     *
+     * @param buildInSshIdentityUsed True to use the build-in SSH priavate key
+     */
     public void setBuildInSshIdentityUsed( boolean buildInSshIdentityUsed )
     {
         this.buildInSshIdentityUsed = buildInSshIdentityUsed;
     }
 
+    /**
+     * Use specified SSH private key for authentication
+     *
+     * @param privateKeyPath Path to SSH private key. However if value is
+     *            {@literal default}, the default OS SSH key will be used. If
+     *            value is {@literal buildin}, a build-in SSH private key, which
+     *            is registered for user {@literal gitconreader} in Github and
+     *            BitBucket will be used.
+     * @see #setBuildInSshIdentityUsed(boolean)
+     */
     public void setSshIdentity( String privateKeyPath )
     {
         this.sshIdentity = privateKeyPath;
     }
 
+    /**
+     * An alternative of {@link #setSshIdentity(String)} that takes a
+     * {@link File} instead of file path.
+     *
+     * @param privateKeyFile SSH private key file object
+     */
     public void setSshIdentityFile( File privateKeyFile )
     {
         setSshIdentity( privateKeyFile == null ? null
                         : privateKeyFile.getAbsolutePath() );
     }
 
+    /**
+     * An alternative method of {@link #setUserPassword(String, String)} which
+     * takes parameters from one single string
+     *
+     * @param userAndPassword One string in form of {@literal <user>:<password>}
+     */
     public void setUserPassword( String userAndPassword )
     {
         int position = userAndPassword.indexOf( ':' );
@@ -179,6 +240,14 @@ public class JGitSource
                          userAndPassword.substring( position + 1 ) );
     }
 
+    /**
+     * Set user and password used to authenticate access to Git repository. It's
+     * often used when Git repo URI starts with {@literal https} where basic
+     * authentication is used.
+     *
+     * @param user Login user name
+     * @param password Login password
+     */
     public void setUserPassword( String user, String password )
     {
         Validate.notNull( user, "User name must be supplied" );
@@ -197,10 +266,12 @@ public class JGitSource
     }
 
     /**
-     * Update local repository by running a <code>git pull</code> command
+     * Update local repository by running a {@literal git pull} command
      *
+     * @inheritDoc
      * @throws GitAPIException Allows JGit exceptions
      */
+    @Override
     public void updateWorkingDirectory( File workingDirectory )
         throws GitAPIException
     {

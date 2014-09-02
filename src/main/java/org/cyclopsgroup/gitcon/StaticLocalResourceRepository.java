@@ -13,7 +13,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implementation of {@link ResourceRepository} based on a local git repository
+ * Implementation of {@link ResourceRepository} based on a local file system
+ * root. It relies on an implementation of {@link Source} to get files from
+ * remote into the file system root.
  */
 public class StaticLocalResourceRepository
     implements Closeable, ResourceRepository
@@ -21,6 +23,11 @@ public class StaticLocalResourceRepository
     private static final Log LOG =
         LogFactory.getLog( StaticLocalResourceRepository.class );
 
+    /**
+     * Create a temporary directory under system temdir
+     *
+     * @return A temporary directory, which does not exist yet
+     */
     public static File createTempDirectory()
     {
         return new File( SystemUtils.JAVA_IO_TMPDIR + "/"
@@ -34,12 +41,29 @@ public class StaticLocalResourceRepository
 
     private final Source source;
 
+    /**
+     * Constructor with a source that is responsible for getting files into the
+     * working directory. The constructor will create a working directory using
+     * {@link #createTempDirectory()} method and wipe out the directory in
+     * {@link #close()} call.
+     *
+     * @param source A source that gets files
+     */
     public StaticLocalResourceRepository( Source source )
     {
         this( createTempDirectory(), source );
 
     }
 
+    /**
+     * Constructor with given working directory and file source and a given
+     * working directory. Working directory will be wiped out in
+     * {@link #close()}
+     *
+     * @param directory Given working directory
+     * @param source Source of files
+     * @see #StaticLocalResourceRepository(Source)
+     */
     public StaticLocalResourceRepository( File directory, Source source )
     {
         this.workingDirectory = directory;
@@ -56,16 +80,30 @@ public class StaticLocalResourceRepository
         wipeWorkingDir();
     }
 
+    /**
+     * @return The actual working directory, the root of local repository
+     */
     public final File getWorkingDirectory()
     {
         return workingDirectory;
     }
 
+    /**
+     * @return The file source
+     */
     public final Source getSource()
     {
         return source;
     }
 
+    /**
+     * This method should be called before instance can be used. In the call,
+     * the file source gets files from remote and save them into a directory
+     * under {@link #workingDirectory}. It does it by calling
+     * {@link Source#initWorkingDirectory(File)}
+     *
+     * @throws Exception Allows any type of exception
+     */
     public void init()
         throws Exception
     {

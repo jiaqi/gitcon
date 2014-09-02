@@ -12,6 +12,13 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * This implementation of {@link ResourceRepository} extends
+ * {@link StaticLocalResourceRepository} by adding a recurring task that sync
+ * local files with remote {@link Source} once a while. It makes sure that when
+ * files in remote source are changed, the local copy gets the change
+ * eventually.
+ */
 public class DynamicLocalResourceRepository
     extends StaticLocalResourceRepository
 {
@@ -77,11 +84,21 @@ public class DynamicLocalResourceRepository
         super.close();
     }
 
+    /**
+     * The default checking interval is
+     * {@value #DEFAULT_UPDATE_INTERVAL_SECONDS} seconds.
+     *
+     * @return Number of seconds between recurring check
+     */
     public int getUpdateIntervalSeconds()
     {
         return updateIntervalSeconds;
     }
 
+    /**
+     * @inheritDoc
+     */
+    @Override
     public void init()
         throws Exception
     {
@@ -99,6 +116,12 @@ public class DynamicLocalResourceRepository
         LOG.info( "Next check is scheduled after " + delay + " seconds" );
     }
 
+    /**
+     * Setting the checking interval. Modification of checking interval takes
+     * effect after the next run dynamically.
+     *
+     * @param updateIntervalSeconds New value of checking interval in secons
+     */
     public void setUpdateIntervalSeconds( int updateIntervalSeconds )
     {
         Validate.isTrue( updateIntervalSeconds > 0, "Invalid minutes"

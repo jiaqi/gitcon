@@ -14,7 +14,9 @@ import org.springframework.beans.factory.FactoryBean;
 
 /**
  * A spring {@link BeanFactory} that creates {@link Properties} based on a file
- * in given {@link ResourceRepository}
+ * in given {@link ResourceRepository}. The properties file is populated using
+ * {@link ExtendedProperties}, where file inclusion and variable replacement are
+ * supported.
  */
 public class GitconPropertiesBeanFactory
     implements FactoryBean<Properties>
