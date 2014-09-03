@@ -9,6 +9,7 @@
     </parent>
     <artifactId>gitcon</artifactId>
     <name>gitcon</name>
+    <packaging>jar</packaging>
     <version>0.0.1</version>
     <description>Git backened runtime config</description>
     <url>http://wiki.cyclopsgroup.org/Gitcon</url>
