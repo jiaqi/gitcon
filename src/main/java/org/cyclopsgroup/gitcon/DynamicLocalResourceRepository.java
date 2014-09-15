@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This implementation of {@link ResourceRepository} extends
  * {@link StaticLocalResourceRepository} by adding a recurring task that sync
- * local files with remote {@link Source} once a while. It makes sure that when
+ * local files with remote {@link FileSystemSource} once a while. It makes sure that when
  * files in remote source are changed, the local copy gets the change
  * eventually.
  */
@@ -59,12 +59,12 @@ public class DynamicLocalResourceRepository
         }
     };
 
-    protected DynamicLocalResourceRepository( File workingDir, Source source )
+    protected DynamicLocalResourceRepository( File workingDir, FileSystemSource source )
     {
         super( workingDir, source );
     }
 
-    protected DynamicLocalResourceRepository( Source source )
+    protected DynamicLocalResourceRepository( FileSystemSource source )
     {
         super( source );
     }

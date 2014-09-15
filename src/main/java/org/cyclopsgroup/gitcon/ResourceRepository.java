@@ -1,6 +1,6 @@
 package org.cyclopsgroup.gitcon;
 
-import java.io.File;
+import org.cyclopsgroup.kaufman.LocateableResource;
 
 /**
  * Interface that expose files for given file path
@@ -14,5 +14,5 @@ public interface ResourceRepository
      * @return A file object. File may not exist if file path points to no
      *         where, in which case this call does not fail.
      */
-    File getResource( String filePath );
+    LocateableResource getResource( String filePath );
 }

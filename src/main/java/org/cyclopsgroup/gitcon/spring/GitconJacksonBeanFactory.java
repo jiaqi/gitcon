@@ -1,9 +1,11 @@
 package org.cyclopsgroup.gitcon.spring;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.cyclopsgroup.gitcon.ResourceRepository;
+import org.cyclopsgroup.kaufman.LocateableResource;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,8 +34,16 @@ public class GitconJacksonBeanFactory<T>
     public T getObject()
         throws IOException
     {
-        File resource = repo.getResource( path );
-        return new ObjectMapper().readValue( resource, beanType );
+        LocateableResource resource = repo.getResource( path );
+        InputStream in = resource.openToRead();
+        try
+        {
+            return new ObjectMapper().readValue( in, beanType );
+        }
+        finally
+        {
+            IOUtils.closeQuietly( in );
+        }
     }
 
     /**

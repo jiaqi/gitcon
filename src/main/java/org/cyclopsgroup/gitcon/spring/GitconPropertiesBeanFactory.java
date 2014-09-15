@@ -1,14 +1,14 @@
 package org.cyclopsgroup.gitcon.spring;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cyclopsgroup.gitcon.ResourceRepository;
+import org.cyclopsgroup.kaufman.LocateableResource;
+import org.cyclopsgroup.kaufman.PropertiesHierarchyUtils;
 import org.cyclopsgroup.kaufman.aws.ExpressionUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -42,22 +42,14 @@ public class GitconPropertiesBeanFactory
     /**
      * @inheritDoc
      */
-    @SuppressWarnings( "unchecked" )
     @Override
     public Properties getObject()
         throws IOException
     {
-        File file = repo.getResource( ExpressionUtils.populate( filePath ) );
-        LOG.info( "Reading extended properties from file " + file );
-        ExtendedProperties props =
-            new ExtendedProperties( file.getAbsolutePath() );
-        Properties p = new Properties();
-        for ( Iterator<String> i = props.getKeys(); i.hasNext(); )
-        {
-            String key = i.next();
-            p.setProperty( key, props.getString( key ) );
-        }
-        return p;
+        LocateableResource resource =
+            repo.getResource( ExpressionUtils.populate( filePath ) );
+        LOG.info( "Reading extended properties from file " + resource );
+        return PropertiesHierarchyUtils.expandInclusion( resource );
     }
 
     /**

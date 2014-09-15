@@ -3,6 +3,7 @@ package org.cyclopsgroup.gitcon;
 import java.io.File;
 
 import org.apache.commons.lang.SystemUtils;
+import org.cyclopsgroup.kaufman.LocateableResource;
 
 /**
  * A simple implementation of {@link ResourceRepository} based on a local file
@@ -35,9 +36,9 @@ public class FileSystemResourceRepository
      * @inheritDoc
      */
     @Override
-    public File getResource( String filePath )
+    public LocateableResource getResource( String filePath )
     {
-        return new File( workingDirectory + SystemUtils.FILE_SEPARATOR
-            + filePath );
+        return LocateableResource.fromFile( new File( workingDirectory
+            + SystemUtils.FILE_SEPARATOR + filePath ) );
     }
 }

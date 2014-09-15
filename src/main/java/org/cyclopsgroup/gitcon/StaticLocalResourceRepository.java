@@ -11,10 +11,11 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cyclopsgroup.kaufman.LocateableResource;
 
 /**
  * Implementation of {@link ResourceRepository} based on a local file system
- * root. It relies on an implementation of {@link Source} to get files from
+ * root. It relies on an implementation of {@link FileSystemSource} to get files from
  * remote into the file system root.
  */
 public class StaticLocalResourceRepository
@@ -39,7 +40,7 @@ public class StaticLocalResourceRepository
 
     private File sourceDirectory;
 
-    private final Source source;
+    private final FileSystemSource source;
 
     /**
      * Constructor with a source that is responsible for getting files into the
@@ -49,7 +50,7 @@ public class StaticLocalResourceRepository
      *
      * @param source A source that gets files
      */
-    public StaticLocalResourceRepository( Source source )
+    public StaticLocalResourceRepository( FileSystemSource source )
     {
         this( createTempDirectory(), source );
 
@@ -62,9 +63,9 @@ public class StaticLocalResourceRepository
      *
      * @param directory Given working directory
      * @param source Source of files
-     * @see #StaticLocalResourceRepository(Source)
+     * @see #StaticLocalResourceRepository(FileSystemSource)
      */
-    public StaticLocalResourceRepository( File directory, Source source )
+    public StaticLocalResourceRepository( File directory, FileSystemSource source )
     {
         this.workingDirectory = directory;
         this.source = source;
@@ -91,7 +92,7 @@ public class StaticLocalResourceRepository
     /**
      * @return The file source
      */
-    public final Source getSource()
+    public final FileSystemSource getSource()
     {
         return source;
     }
@@ -100,7 +101,7 @@ public class StaticLocalResourceRepository
      * This method should be called before instance can be used. In the call,
      * the file source gets files from remote and save them into a directory
      * under {@link #workingDirectory}. It does it by calling
-     * {@link Source#initWorkingDirectory(File)}
+     * {@link FileSystemSource#initWorkingDirectory(File)}
      *
      * @throws Exception Allows any type of exception
      */
@@ -127,10 +128,10 @@ public class StaticLocalResourceRepository
      * @inheritDoc
      */
     @Override
-    public File getResource( String filePath )
+    public LocateableResource getResource( String filePath )
     {
-        return new File( sourceDirectory + SystemUtils.FILE_SEPARATOR
-            + filePath );
+        return LocateableResource.fromFile( new File( sourceDirectory
+            + SystemUtils.FILE_SEPARATOR + filePath ) );
     }
 
     private void wipeWorkingDir()

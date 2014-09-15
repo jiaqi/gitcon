@@ -13,7 +13,7 @@ public class DynamicLocalResourceRepositoryTest
 {
     private Mockery mock;
 
-    private Source source;
+    private FileSystemSource source;
 
     private File workingDirectory;
 
@@ -23,7 +23,7 @@ public class DynamicLocalResourceRepositoryTest
     public void setUpMocks()
     {
         mock = new Mockery();
-        source = mock.mock( Source.class );
+        source = mock.mock( FileSystemSource.class );
         workingDirectory = DynamicLocalResourceRepository.createTempDirectory();
         repo = new DynamicLocalResourceRepository( workingDirectory, source );
     }

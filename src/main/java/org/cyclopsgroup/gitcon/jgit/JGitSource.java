@@ -9,7 +9,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cyclopsgroup.gitcon.Source;
+import org.cyclopsgroup.gitcon.FileSystemSource;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
@@ -19,7 +19,7 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 /**
- * Implementation of {@link Source} that gets file from a Git repository. There
+ * Implementation of {@link FileSystemSource} that gets file from a Git repository. There
  * are several ways of authenticating access to git.
  * <ol>
  * <li>Username and password is supported, but it's the least recommended
@@ -42,7 +42,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
  * </ol>
  */
 public class JGitSource
-    implements Source
+    implements FileSystemSource
 {
     private static final Log LOG = LogFactory.getLog( JGitSource.class );
 
@@ -139,7 +139,6 @@ public class JGitSource
         if ( credentialsProvider != null )
         {
             clone.setCredentialsProvider( credentialsProvider );
-
         }
         LOG.info( "Running git clone " + repoUri + " against "
             + sourceDirectory );

@@ -6,7 +6,7 @@ import java.io.File;
  * A source that gets files from a logical repository into physical local file
  * system
  */
-public interface Source
+public interface FileSystemSource
 {
     /**
      * Get files from logical source into local working directory when
@@ -16,7 +16,7 @@ public interface Source
      *            repository
      * @return The root of copied files from logical source under working
      *         directory. It's not necessarily the same working directory, since
-     *         the implementation of {@link Source} may choose to download
+     *         the implementation of {@link FileSystemSource} may choose to download
      *         remote files into a subdirectory under working directory, in
      *         which case the subdirectory is returned.
      * @throws Exception Allows any exception
