@@ -15,11 +15,11 @@ import org.cyclopsgroup.kaufman.LocateableResource;
 
 /**
  * Implementation of {@link ResourceRepository} based on a local file system
- * root. It relies on an implementation of {@link FileSystemSource} to get files from
- * remote into the file system root.
+ * root. It relies on an implementation of {@link FileSystemSource} to get files
+ * from remote into the file system root.
  */
 public class StaticLocalResourceRepository
-    implements Closeable, ResourceRepository
+    implements Closeable, LocalResourceRepository
 {
     private static final Log LOG =
         LogFactory.getLog( StaticLocalResourceRepository.class );
@@ -36,11 +36,27 @@ public class StaticLocalResourceRepository
             + RandomStringUtils.randomAlphabetic( 8 ) + "-working-dir" );
     }
 
-    private final File workingDirectory;
+    private final FileSystemSource source;
 
     private File sourceDirectory;
 
-    private final FileSystemSource source;
+    private final File workingDirectory;
+
+    /**
+     * Constructor with given working directory and file source and a given
+     * working directory. Working directory will be wiped out in
+     * {@link #close()}
+     *
+     * @param directory Given working directory
+     * @param source Source of files
+     * @see #StaticLocalResourceRepository(FileSystemSource)
+     */
+    public StaticLocalResourceRepository( File directory,
+                                          FileSystemSource source )
+    {
+        this.workingDirectory = directory;
+        this.source = source;
+    }
 
     /**
      * Constructor with a source that is responsible for getting files into the
@@ -57,21 +73,6 @@ public class StaticLocalResourceRepository
     }
 
     /**
-     * Constructor with given working directory and file source and a given
-     * working directory. Working directory will be wiped out in
-     * {@link #close()}
-     *
-     * @param directory Given working directory
-     * @param source Source of files
-     * @see #StaticLocalResourceRepository(FileSystemSource)
-     */
-    public StaticLocalResourceRepository( File directory, FileSystemSource source )
-    {
-        this.workingDirectory = directory;
-        this.source = source;
-    }
-
-    /**
      * @inheirtDoc
      */
     @Override
@@ -82,11 +83,22 @@ public class StaticLocalResourceRepository
     }
 
     /**
-     * @return The actual working directory, the root of local repository
+     * @inheritDoc
      */
-    public final File getWorkingDirectory()
+    @Override
+    public File getRepositoryDirectory()
     {
-        return workingDirectory;
+        return sourceDirectory;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public LocateableResource getResource( String filePath )
+    {
+        return LocateableResource.fromFile( new File( sourceDirectory
+            + SystemUtils.FILE_SEPARATOR + filePath ) );
     }
 
     /**
@@ -95,6 +107,14 @@ public class StaticLocalResourceRepository
     public final FileSystemSource getSource()
     {
         return source;
+    }
+
+    /**
+     * @return The actual working directory, the root of local repository
+     */
+    public final File getWorkingDirectory()
+    {
+        return workingDirectory;
     }
 
     /**
@@ -122,16 +142,6 @@ public class StaticLocalResourceRepository
         {
             LOG.warn( "Nothing is found in directory " + workingDirectory );
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    @Override
-    public LocateableResource getResource( String filePath )
-    {
-        return LocateableResource.fromFile( new File( sourceDirectory
-            + SystemUtils.FILE_SEPARATOR + filePath ) );
     }
 
     private void wipeWorkingDir()

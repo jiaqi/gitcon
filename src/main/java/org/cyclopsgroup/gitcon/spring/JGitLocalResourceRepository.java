@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 
-import org.cyclopsgroup.gitcon.ResourceRepository;
+import org.cyclopsgroup.gitcon.LocalResourceRepository;
 import org.cyclopsgroup.gitcon.StaticLocalResourceRepository;
 import org.cyclopsgroup.gitcon.jgit.JGitSource;
 import org.cyclopsgroup.kaufman.LocateableResource;
@@ -17,7 +17,8 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class JGitLocalResourceRepository
     extends JGitSource
-    implements Closeable, ResourceRepository, InitializingBean, DisposableBean
+    implements Closeable, LocalResourceRepository, InitializingBean,
+    DisposableBean
 {
     private final StaticLocalResourceRepository localRepo;
 
@@ -62,6 +63,15 @@ public class JGitLocalResourceRepository
         throws IOException
     {
         localRepo.close();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public File getRepositoryDirectory()
+    {
+        return localRepo.getRepositoryDirectory();
     }
 
     /**

@@ -3,33 +3,37 @@ package org.cyclopsgroup.gitcon;
 import java.io.File;
 
 import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang.Validate;
 import org.cyclopsgroup.kaufman.LocateableResource;
+import org.cyclopsgroup.kaufman.aws.ExpressionUtils;
 
 /**
- * A simple implementation of {@link ResourceRepository} based on a local file
- * system directory.
+ * A simple implementation that points to a local directory to get resources
  */
 public class FileSystemResourceRepository
-    implements ResourceRepository
+    implements LocalResourceRepository
 {
-    private final File workingDirectory;
+    private File rootDirectory;
 
-    /**
-     * @param directory The root of local file system where configuration files
-     *            are stored
-     */
-    public FileSystemResourceRepository( File directory )
+    public FileSystemResourceRepository( File rootDirectory )
     {
-        this.workingDirectory = directory;
+        Validate.isTrue( rootDirectory.isDirectory(), "Root directory "
+            + rootDirectory + " is not a directory" );
+        this.rootDirectory = rootDirectory;
+    }
+
+    public FileSystemResourceRepository( String rootDirectory )
+    {
+        this( new File( ExpressionUtils.populate( rootDirectory ) ) );
     }
 
     /**
-     * @return The root of local file system where configuration files are
-     *         stored
+     * @inheritDoc
      */
-    public final File getWorkingDirectory()
+    @Override
+    public File getRepositoryDirectory()
     {
-        return workingDirectory;
+        return rootDirectory;
     }
 
     /**
@@ -38,7 +42,9 @@ public class FileSystemResourceRepository
     @Override
     public LocateableResource getResource( String filePath )
     {
-        return LocateableResource.fromFile( new File( workingDirectory
-            + SystemUtils.FILE_SEPARATOR + filePath ) );
+        return LocateableResource.fromFile( new File(
+                                                      rootDirectory.getAbsolutePath()
+                                                          + SystemUtils.FILE_SEPARATOR
+                                                          + filePath ) );
     }
 }
