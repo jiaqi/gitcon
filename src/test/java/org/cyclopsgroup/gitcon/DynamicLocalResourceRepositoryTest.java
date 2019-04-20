@@ -9,47 +9,41 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DynamicLocalResourceRepositoryTest
-{
-    private Mockery mock;
+public class DynamicLocalResourceRepositoryTest {
+  private Mockery mock;
 
-    private FileSystemSource source;
+  private FileSystemSource source;
 
-    private File workingDirectory;
+  private File workingDirectory;
 
-    private DynamicLocalResourceRepository repo;
+  private DynamicLocalResourceRepository repo;
 
-    @Before
-    public void setUpMocks()
-    {
-        mock = new Mockery();
-        source = mock.mock( FileSystemSource.class );
-        workingDirectory = DynamicLocalResourceRepository.createTempDirectory();
-        repo = new DynamicLocalResourceRepository( workingDirectory, source );
-    }
+  @Before
+  public void setUpMocks() {
+    mock = new Mockery();
+    source = mock.mock(FileSystemSource.class);
+    workingDirectory = DynamicLocalResourceRepository.createTempDirectory();
+    repo = new DynamicLocalResourceRepository(workingDirectory, source);
+  }
 
-    @After
-    public void assertMocks()
-        throws IOException
-    {
-        repo.close();
-        mock.assertIsSatisfied();
-    }
+  @After
+  public void assertMocks() throws IOException {
+    repo.close();
+    mock.assertIsSatisfied();
+  }
 
-    @Test
-    public void testInitAndUpdate()
-        throws Exception
-    {
-        repo.setUpdateIntervalSeconds( 5 );
-        mock.checking( new Expectations()
-        {
-            {
-                oneOf( source ).initWorkingDirectory( workingDirectory );
+  @Test
+  public void testInitAndUpdate() throws Exception {
+    repo.setUpdateIntervalSeconds(5);
+    mock.checking(
+        new Expectations() {
+          {
+            oneOf(source).initWorkingDirectory(workingDirectory);
 
-                atLeast( 1 ).of( source ).updateWorkingDirectory( workingDirectory );
-            }
-        } );
-        repo.init();
-        Thread.sleep( 8000L );
-    }
+            atLeast(1).of(source).updateWorkingDirectory(workingDirectory);
+          }
+        });
+    repo.init();
+    Thread.sleep(8000L);
+  }
 }
