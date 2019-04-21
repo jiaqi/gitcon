@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import org.cyclopsgroup.gitcon.LocalResourceRepository;
 import org.cyclopsgroup.gitcon.StaticLocalResourceRepository;
+import org.cyclopsgroup.gitcon.io.LocateableResource;
 import org.cyclopsgroup.gitcon.jgit.JGitSource;
-import org.cyclopsgroup.kaufman.LocateableResource;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 

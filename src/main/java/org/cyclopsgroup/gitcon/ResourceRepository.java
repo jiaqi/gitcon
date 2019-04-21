@@ -1,6 +1,6 @@
 package org.cyclopsgroup.gitcon;
 
-import org.cyclopsgroup.kaufman.LocateableResource;
+import org.cyclopsgroup.gitcon.io.LocateableResource;
 
 /** Interface that expose files for given file path */
 public interface ResourceRepository {

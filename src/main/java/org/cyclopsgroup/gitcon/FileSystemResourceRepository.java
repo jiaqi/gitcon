@@ -1,19 +1,18 @@
 package org.cyclopsgroup.gitcon;
 
 import java.io.File;
-
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.Validate;
-import org.cyclopsgroup.kaufman.LocateableResource;
-import org.cyclopsgroup.kaufman.aws.ExpressionUtils;
+import org.cyclopsgroup.gitcon.io.ExpressionUtils;
+import org.cyclopsgroup.gitcon.io.LocateableResource;
 
 /** A simple implementation that points to a local directory to get resources */
 public class FileSystemResourceRepository implements LocalResourceRepository {
   private File rootDirectory;
 
   public FileSystemResourceRepository(File rootDirectory) {
-    Validate.isTrue(
-        rootDirectory.isDirectory(), "Root directory " + rootDirectory + " is not a directory");
+    Validate.isTrue(rootDirectory.isDirectory(),
+        "Root directory is not a directory: " + rootDirectory);
     this.rootDirectory = rootDirectory;
   }
 

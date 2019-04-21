@@ -10,7 +10,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cyclopsgroup.kaufman.LocateableResource;
+import org.cyclopsgroup.gitcon.io.LocateableResource;
 
 /**
  * Implementation of {@link ResourceRepository} based on a local file system root. It relies on an
@@ -26,12 +26,8 @@ public class StaticLocalResourceRepository implements Closeable, LocalResourceRe
    */
   public static File createTempDirectory() {
     return new File(
-        SystemUtils.JAVA_IO_TMPDIR
-            + "/"
-            + StaticLocalResourceRepository.class.getSimpleName()
-            + "-"
-            + RandomStringUtils.randomAlphabetic(8)
-            + "-working-dir");
+        SystemUtils.JAVA_IO_TMPDIR + "/" + StaticLocalResourceRepository.class.getSimpleName() + "-"
+            + RandomStringUtils.randomAlphabetic(8) + "-working-dir");
   }
 
   private final FileSystemSource source;
@@ -77,8 +73,8 @@ public class StaticLocalResourceRepository implements Closeable, LocalResourceRe
 
   @Override
   public LocateableResource getResource(String filePath) {
-    return LocateableResource.fromFile(
-        new File(sourceDirectory + SystemUtils.FILE_SEPARATOR + filePath));
+    return LocateableResource
+        .fromFile(new File(sourceDirectory + SystemUtils.FILE_SEPARATOR + filePath));
   }
 
   /** @return The file source */

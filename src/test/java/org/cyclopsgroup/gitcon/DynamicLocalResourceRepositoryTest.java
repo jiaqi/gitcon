@@ -2,7 +2,6 @@ package org.cyclopsgroup.gitcon;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.After;
@@ -35,14 +34,12 @@ public class DynamicLocalResourceRepositoryTest {
   @Test
   public void testInitAndUpdate() throws Exception {
     repo.setUpdateIntervalSeconds(5);
-    mock.checking(
-        new Expectations() {
-          {
-            oneOf(source).initWorkingDirectory(workingDirectory);
-
-            atLeast(1).of(source).updateWorkingDirectory(workingDirectory);
-          }
-        });
+    mock.checking(new Expectations() {
+      {
+        oneOf(source).initWorkingDirectory(workingDirectory);
+        atLeast(1).of(source).updateWorkingDirectory(workingDirectory);
+      }
+    });
     repo.init();
     Thread.sleep(8000L);
   }
