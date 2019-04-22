@@ -10,7 +10,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cyclopsgroup.gitcon.io.LocateableResource;
 
 /**
  * Implementation of {@link ResourceRepository} based on a local file system root. It relies on an
@@ -72,8 +71,8 @@ public class StaticLocalResourceRepository implements Closeable, LocalResourceRe
   }
 
   @Override
-  public LocateableResource getResource(String filePath) {
-    return LocateableResource
+  public Resource getResource(String filePath) {
+    return Resource
         .fromFile(new File(sourceDirectory + SystemUtils.FILE_SEPARATOR + filePath));
   }
 

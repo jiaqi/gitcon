@@ -1,4 +1,4 @@
-package org.cyclopsgroup.gitcon.io;
+package org.cyclopsgroup.gitcon;
 
 import java.util.HashMap;
 import java.util.Map;

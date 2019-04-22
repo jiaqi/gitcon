@@ -3,8 +3,6 @@ package org.cyclopsgroup.gitcon;
 import java.io.File;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.Validate;
-import org.cyclopsgroup.gitcon.io.ExpressionUtils;
-import org.cyclopsgroup.gitcon.io.LocateableResource;
 
 /** A simple implementation that points to a local directory to get resources */
 public class FileSystemResourceRepository implements LocalResourceRepository {
@@ -26,8 +24,8 @@ public class FileSystemResourceRepository implements LocalResourceRepository {
   }
 
   @Override
-  public LocateableResource getResource(String filePath) {
-    return LocateableResource.fromFile(
+  public Resource getResource(String filePath) {
+    return Resource.fromFile(
         new File(rootDirectory.getAbsolutePath() + SystemUtils.FILE_SEPARATOR + filePath));
   }
 }

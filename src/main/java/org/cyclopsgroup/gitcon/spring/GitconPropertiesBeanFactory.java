@@ -5,10 +5,9 @@ import java.util.Properties;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cyclopsgroup.gitcon.ExpressionUtils;
+import org.cyclopsgroup.gitcon.Resource;
 import org.cyclopsgroup.gitcon.ResourceRepository;
-import org.cyclopsgroup.gitcon.io.ExpressionUtils;
-import org.cyclopsgroup.gitcon.io.LocateableResource;
-import org.cyclopsgroup.gitcon.io.PropertiesHierarchyUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -35,7 +34,7 @@ public class GitconPropertiesBeanFactory implements FactoryBean<Properties> {
 
   @Override
   public Properties getObject() throws IOException {
-    LocateableResource resource = repo.getResource(ExpressionUtils.populate(filePath));
+    Resource resource = repo.getResource(ExpressionUtils.populate(filePath));
     LOG.info("Reading extended properties from file " + resource);
     return PropertiesHierarchyUtils.expandInclusion(resource);
   }

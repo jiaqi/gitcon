@@ -1,12 +1,13 @@
-package org.cyclopsgroup.gitcon.io;
+package org.cyclopsgroup.gitcon.spring;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
+import org.cyclopsgroup.gitcon.Resource;
 
-public class PropertiesHierarchyUtils {
-  public static Properties subset(Properties source, String prefix) {
+class PropertiesHierarchyUtils {
+  static Properties subset(Properties source, String prefix) {
     Properties props = new Properties();
     for (Object keyObject : source.keySet()) {
       String key = (String) keyObject;
@@ -19,7 +20,7 @@ public class PropertiesHierarchyUtils {
     return props;
   }
 
-  public static Properties expandInclusion(LocateableResource resource) throws IOException {
+  static Properties expandInclusion(Resource resource) throws IOException {
     Properties source = new Properties();
     InputStream in = resource.openToRead();
     try {
@@ -36,7 +37,7 @@ public class PropertiesHierarchyUtils {
     String[] includes = StringUtils.split(includeProperty, ',');
     Properties result = new Properties();
     for (String include : includes) {
-      Properties props = expandInclusion(resource.locate(include));
+      Properties props = expandInclusion(resource.reference(include));
       result.putAll(props);
     }
     result.putAll(source);

@@ -1,4 +1,4 @@
-package org.cyclopsgroup.gitcon.io;
+package org.cyclopsgroup.gitcon;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,8 +7,8 @@ import java.io.InputStream;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.Validate;
 
-public abstract class LocateableResource {
-  private static class FileResource extends LocateableResource {
+public abstract class Resource {
+  private static class FileResource extends Resource {
     private final File file;
 
     private FileResource(File file) {
@@ -20,7 +20,7 @@ public abstract class LocateableResource {
      * @inheritDoc
      */
     @Override
-    public LocateableResource locate(String relativePath) {
+    public Resource reference(String relativePath) {
       String parentPath = file.getParentFile().getAbsolutePath();
       if (!parentPath.endsWith(SystemUtils.FILE_SEPARATOR)) {
         parentPath += SystemUtils.FILE_SEPARATOR;
@@ -45,11 +45,11 @@ public abstract class LocateableResource {
     }
   }
 
-  public static LocateableResource fromFile(File file) {
+  public static Resource fromFile(File file) {
     return new FileResource(file);
   }
 
-  public abstract LocateableResource locate(String relativePath);
+  public abstract Resource reference(String relativePath);
 
   public abstract InputStream openToRead() throws IOException;
 }

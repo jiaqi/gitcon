@@ -4,8 +4,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import org.cyclopsgroup.gitcon.LocalResourceRepository;
+import org.cyclopsgroup.gitcon.Resource;
 import org.cyclopsgroup.gitcon.StaticLocalResourceRepository;
-import org.cyclopsgroup.gitcon.io.LocateableResource;
 import org.cyclopsgroup.gitcon.jgit.JGitSource;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -46,7 +46,7 @@ public class JGitLocalResourceRepository extends JGitSource
   }
 
   @Override
-  public LocateableResource getResource(String filePath) {
+  public Resource getResource(String filePath) {
     return localRepo.getResource(filePath);
   }
 }
