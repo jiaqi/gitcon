@@ -1,9 +1,11 @@
-query { 
-  repository(owner:"%s", name:"%s") { 
-    content:object(expression: "%s:%s") {
-      ... on Blob {
-        text
+{
+  "query": "query {
+    repository(owner:\"%s\", name:\"%s\") { 
+      content:object(expression: \"%s:%s\") {
+        ... on Blob {
+          text
+        }
       }
     }
-  }
+  }"
 }

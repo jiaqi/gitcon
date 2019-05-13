@@ -1,7 +1,6 @@
 package org.cyclopsgroup.gitcon.spring;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.cyclopsgroup.gitcon.Resource;
@@ -22,12 +21,7 @@ class PropertiesHierarchyUtils {
 
   static Properties expandInclusion(Resource resource) throws IOException {
     Properties source = new Properties();
-    InputStream in = resource.openToRead();
-    try {
-      source.load(in);
-    } finally {
-      in.close();
-    }
+    resource.read(source::load);
     String includeProperty = source.getProperty("include", null);
     source.remove("include");
     if (StringUtils.isBlank(includeProperty)) {

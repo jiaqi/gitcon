@@ -1,13 +1,15 @@
 package org.cyclopsgroup.gitcon.github;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import javax.net.ssl.HttpsURLConnection;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.cyclopsgroup.gitcon.Resource;
+import org.cyclopsgroup.gitcon.Resource.CheckedStreamConsumer;
 import org.cyclopsgroup.gitcon.ResourceRepository;
 
 /**
@@ -26,8 +28,8 @@ public class GithubResourceRepository implements ResourceRepository {
     }
 
     @Override
-    public InputStream openToRead() throws IOException {
-      return post(blobPath);
+    public void read(CheckedStreamConsumer consumer) throws IOException {
+      post(consumer, blobPath);
     }
 
     @Override
@@ -37,15 +39,16 @@ public class GithubResourceRepository implements ResourceRepository {
     }
   }
 
-  private String accessToken = "";
   private String branchName = "master";
 
   private final String githubUser;
   private final String repositoryName;
+  private final String accessToken;
 
-  public GithubResourceRepository(String githubUser, String repositoryName) {
+  public GithubResourceRepository(String githubUser, String repositoryName, String accessToken) {
     this.githubUser = githubUser;
     this.repositoryName = repositoryName;
+    this.accessToken = accessToken;
   }
 
   @Override
@@ -56,51 +59,28 @@ public class GithubResourceRepository implements ResourceRepository {
     return new ResourceImpl(filePath);
   }
 
-  /** @param accessToken the accessToken to set */
-  public void setAccessToken(String accessToken) {
-    this.accessToken = accessToken;
-  }
-
   /** @param branchName the branchName to set */
   public void setBranchName(String branchName) {
     this.branchName = branchName;
   }
 
-  private InputStream post(String filePath) throws IOException {
-    URL target = new URL("https://api.github.com/graphql");
-    HttpsURLConnection con = (HttpsURLConnection) target.openConnection();
-
-    con.setRequestMethod("POST");
-    if (!accessToken.isEmpty()) {
-      con.setRequestProperty("Authorization", "bearer " + accessToken);
-    }
-    con.setDoOutput(true);
-
+  private void post(CheckedStreamConsumer consumer, String filePath) throws IOException {
     String bodyFormat =
         IOUtils.toString(getClass().getResource("get_blob_content.gql"), StandardCharsets.UTF_8);
-    String data = String.format(bodyFormat, githubUser, repositoryName, branchName, filePath);
+    String data =
+        String.format(bodyFormat, githubUser, repositoryName, branchName, filePath)
+            .replaceAll("\\s+", " ");
+    System.out.println(data);
 
-    con.getOutputStream().write(data.getBytes(StandardCharsets.UTF_8));
-    con.getOutputStream().flush();
-    con.getOutputStream().close();
-
-    InputStream in =
-        new FilterInputStream(con.getInputStream()) {
-          @Override
-          public void close() throws IOException {
-            try {
-              super.close();
-            } finally {
-              con.disconnect();
-            }
-          }
-        };
-    return in;
-  }
-
-  public static void main(String[] args) throws IOException {
-    GithubResourceRepository repo = new GithubResourceRepository("jiaqi", "jcli");
-    String s = IOUtils.toString(repo.getResource("pom.xml").openToRead(), StandardCharsets.UTF_8);
-    System.out.println(s);
+    HttpPost post = new HttpPost("https://api.github.com/graphql");
+    post.setEntity(new StringEntity(data));
+    if (!accessToken.isEmpty()) {
+      post.addHeader("Authorization", "bearer " + accessToken);
+    }
+    try (CloseableHttpClient client = HttpClients.createDefault()) {
+      try (CloseableHttpResponse response = client.execute(post)) {
+        consumer.consume(response.getEntity().getContent());
+      }
+    }
   }
 }

@@ -8,6 +8,10 @@ import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.Validate;
 
 public abstract class Resource {
+  public interface CheckedStreamConsumer {
+    void consume(InputStream in) throws IOException;
+  }
+
   private static class FileResource extends Resource {
     private final File file;
 
@@ -16,9 +20,6 @@ public abstract class Resource {
       this.file = file;
     }
 
-    /**
-     * @inheritDoc
-     */
     @Override
     public Resource reference(String relativePath) {
       String parentPath = file.getParentFile().getAbsolutePath();
@@ -28,17 +29,13 @@ public abstract class Resource {
       return new FileResource(new File(parentPath + relativePath));
     }
 
-    /**
-     * @inheritDoc
-     */
     @Override
-    public InputStream openToRead() throws IOException {
-      return new FileInputStream(file);
+    public void read(CheckedStreamConsumer consumer) throws IOException {
+      try (InputStream in = new FileInputStream(file)) {
+        consumer.consume(in);
+      }
     }
 
-    /**
-     * @inheritDoc
-     */
     @Override
     public String toString() {
       return "file://" + file;
@@ -51,5 +48,5 @@ public abstract class Resource {
 
   public abstract Resource reference(String relativePath);
 
-  public abstract InputStream openToRead() throws IOException;
+  public abstract void read(CheckedStreamConsumer consumer) throws IOException;
 }

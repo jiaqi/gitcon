@@ -25,8 +25,12 @@ public class StaticLocalResourceRepository implements Closeable, LocalResourceRe
    */
   public static File createTempDirectory() {
     return new File(
-        SystemUtils.JAVA_IO_TMPDIR + "/" + StaticLocalResourceRepository.class.getSimpleName() + "-"
-            + RandomStringUtils.randomAlphabetic(8) + "-working-dir");
+        SystemUtils.JAVA_IO_TMPDIR
+            + "/"
+            + StaticLocalResourceRepository.class.getSimpleName()
+            + "-"
+            + RandomStringUtils.randomAlphabetic(8)
+            + "-working-dir");
   }
 
   private final FileSystemSource source;
@@ -59,7 +63,6 @@ public class StaticLocalResourceRepository implements Closeable, LocalResourceRe
     this(createTempDirectory(), source);
   }
 
-  /** @inheirtDoc */
   @Override
   public void close() throws IOException {
     wipeWorkingDir();
@@ -72,8 +75,7 @@ public class StaticLocalResourceRepository implements Closeable, LocalResourceRe
 
   @Override
   public Resource getResource(String filePath) {
-    return Resource
-        .fromFile(new File(sourceDirectory + SystemUtils.FILE_SEPARATOR + filePath));
+    return Resource.fromFile(new File(sourceDirectory + SystemUtils.FILE_SEPARATOR + filePath));
   }
 
   /** @return The file source */
