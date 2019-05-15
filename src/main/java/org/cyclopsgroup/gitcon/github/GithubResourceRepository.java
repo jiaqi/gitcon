@@ -16,13 +16,7 @@ import org.cyclopsgroup.gitcon.ResourceRepository;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Example query:
- *
- * <p>query { repository(owner: "jiaqi", name: "cloudpave-runtime-config") {
- * content:object(expression: "master:cyclone-service/cyclone-service-local.properties") { ... on
- * Blob { text } } } }
- */
+/** Resource repository that read file from Github with GraphQL Github API V4. */
 public class GithubResourceRepository implements ResourceRepository {
   private class ResourceImpl extends Resource {
     private final String blobPath;
@@ -55,7 +49,6 @@ public class GithubResourceRepository implements ResourceRepository {
   }
 
   private String branchName = "master";
-
   private final String githubUser;
   private final String repositoryName;
   private final String accessToken;
