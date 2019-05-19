@@ -9,9 +9,9 @@ public class FileSystemResourceRepository implements LocalResourceRepository {
   private File rootDirectory;
 
   public FileSystemResourceRepository(File rootDirectory) {
-    Validate.isTrue(rootDirectory.isDirectory(),
-        "Root directory is not a directory: " + rootDirectory);
-    this.rootDirectory = rootDirectory;
+    File root = rootDirectory.getAbsoluteFile();
+    Validate.isTrue(root.isDirectory(), "Root directory is not a directory: " + root);
+    this.rootDirectory = root;
   }
 
   public FileSystemResourceRepository(String rootDirectory) {
