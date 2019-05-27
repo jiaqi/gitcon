@@ -11,11 +11,6 @@ public class LocalOrGithubResourceRepository implements ResourceRepository {
     return new FileSystemResourceRepository(new File(getPropertyOrFail("gitcon.dir")));
   }
 
-  private static ResourceRepository createGithubRepository(String user, String project)
-      throws IOException {
-    return new GithubResourceRepository(user, project, getPropertyOrFail("gitcon.token"));
-  }
-
   private static String getPropertyOrFail(String name) {
     String value = System.getProperty(name);
     if (value == null) {
@@ -27,13 +22,18 @@ public class LocalOrGithubResourceRepository implements ResourceRepository {
 
   private final ResourceRepository delegate;
 
-  public LocalOrGithubResourceRepository(String githubUser, String githubProject)
-      throws IOException {
-    String type = System.getProperty("gitcon.type", "file");
-    if (type.equalsIgnoreCase("github")) {
-      this.delegate = createGithubRepository(githubUser, githubProject);
-    } else {
-      this.delegate = createFileSystemRepository();
+  public LocalOrGithubResourceRepository(String githubUser, String githubProject,
+      String accessToken) throws IOException {
+    String type = System.getProperty("gitcon.type", "github");
+    switch (type) {
+      case "github":
+        this.delegate = new GithubResourceRepository(githubUser, githubProject, accessToken);
+        break;
+      case "local":
+        this.delegate = createFileSystemRepository();
+        break;
+      default:
+        throw new IllegalStateException("Unexpected github.type value " + type);
     }
   }
 

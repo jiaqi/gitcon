@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -15,9 +17,14 @@ import org.cyclopsgroup.gitcon.Resource.CheckedStreamConsumer;
 import org.cyclopsgroup.gitcon.ResourceRepository;
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.common.base.Preconditions;
 
 /** Resource repository that read file from Github with GraphQL Github API V4. */
 public class GithubResourceRepository implements ResourceRepository {
+  private static final Pattern GCS_PATTERN = Pattern.compile("^gs://((\\w|-|\\.)+)/(.+)$");
+
   private class ResourceImpl extends Resource {
     private final String blobPath;
 
@@ -48,6 +55,20 @@ public class GithubResourceRepository implements ResourceRepository {
     }
   }
 
+  private static String readGcsIfApplicable(String string) {
+    Matcher m = GCS_PATTERN.matcher(string);
+    if (!m.matches()) {
+      return string;
+    }
+    Preconditions.checkState(m.groupCount() == 3, "Invalid groups %s found, 3 is expected.",
+        m.groupCount());
+
+    String bucketName = m.group(1);
+    String objectKey = m.group(3);
+    Storage storage = StorageOptions.getDefaultInstance().getService();
+    return new String(storage.readAllBytes(bucketName, objectKey), StandardCharsets.UTF_8);
+  }
+
   private String branchName = "master";
   private final String githubUser;
   private final String repositoryName;
@@ -58,7 +79,7 @@ public class GithubResourceRepository implements ResourceRepository {
       throws IOException {
     this.githubUser = githubUser;
     this.repositoryName = repositoryName;
-    this.accessToken = accessToken;
+    this.accessToken = readGcsIfApplicable(accessToken);
     this.bodyFormat =
         IOUtils.toString(getClass().getResource("get_blob_content.gql"), StandardCharsets.UTF_8);
   }
@@ -94,20 +115,10 @@ public class GithubResourceRepository implements ResourceRepository {
         content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
       }
     }
-    String document =
-        new JSONObject(content)
-            .getJSONObject("data")
-            .getJSONObject("repository")
-            .getJSONObject("content")
-            .getString("text");
+    String document = new JSONObject(content).getJSONObject("data").getJSONObject("repository")
+        .getJSONObject("content").getString("text");
     try (InputStream in = new ByteArrayInputStream(document.getBytes(StandardCharsets.UTF_8))) {
       consumer.consume(in);
     }
-  }
-
-  public static void main(String[] args) throws IOException {
-    new GithubResourceRepository("jiaqi", "cloudpave-runtime-config", "<token>")
-        .getResource("README.md")
-        .read(i -> System.out.println(IOUtils.toString(i, StandardCharsets.UTF_8)));
   }
 }
