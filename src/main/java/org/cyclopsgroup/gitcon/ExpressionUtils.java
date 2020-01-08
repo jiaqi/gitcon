@@ -20,12 +20,12 @@ public class ExpressionUtils {
     return populateInternally(input, props);
   }
 
-  private static String populateInternally(String input,
-      Map<? extends Object, ? extends Object> map) {
+  private static String populateInternally(
+      String input, Map<? extends Object, ? extends Object> map) {
     StringBuilder result = new StringBuilder();
     String in = input;
     int start;
-    for (;;) {
+    for (; ; ) {
       start = in.indexOf("${");
       if (start == -1) {
         result.append(in);

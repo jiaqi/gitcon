@@ -30,20 +30,21 @@ public class DynamicLocalResourceRepository extends StaticLocalResourceRepositor
 
   private volatile int updateIntervalSeconds = DEFAULT_UPDATE_INTERVAL_SECONDS;
 
-  private final Runnable updateTask = new Runnable() {
-    @Override
-    public void run() {
-      try {
-        getSource().updateWorkingDirectory(getWorkingDirectory());
-      } catch (Throwable e) {
-        LOG.error("Update operation failed: " + e.getMessage(), e);
-      } finally {
-        if (!closing) {
-          scheduleNextCheck();
+  private final Runnable updateTask =
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            getSource().updateWorkingDirectory(getWorkingDirectory());
+          } catch (Throwable e) {
+            LOG.error("Update operation failed: " + e.getMessage(), e);
+          } finally {
+            if (!closing) {
+              scheduleNextCheck();
+            }
+          }
         }
-      }
-    }
-  };
+      };
 
   protected DynamicLocalResourceRepository(File workingDir, FileSystemSource source) {
     super(workingDir, source);
@@ -90,7 +91,8 @@ public class DynamicLocalResourceRepository extends StaticLocalResourceRepositor
    * @param updateIntervalSeconds New value of checking interval in secons
    */
   public void setUpdateIntervalSeconds(int updateIntervalSeconds) {
-    Validate.isTrue(updateIntervalSeconds > 0,
+    Validate.isTrue(
+        updateIntervalSeconds > 0,
         "Invalid update interval: " + updateIntervalSeconds + " seconds.");
     this.updateIntervalSeconds = updateIntervalSeconds;
   }

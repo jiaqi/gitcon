@@ -1,5 +1,8 @@
 package org.cyclopsgroup.gitcon.github;
 
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.common.base.Preconditions;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,9 +20,6 @@ import org.cyclopsgroup.gitcon.Resource.CheckedStreamConsumer;
 import org.cyclopsgroup.gitcon.ResourceRepository;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-import com.google.common.base.Preconditions;
 
 /** Resource repository that read file from Github with GraphQL Github API V4. */
 public class GithubResourceRepository implements ResourceRepository {
@@ -60,8 +60,8 @@ public class GithubResourceRepository implements ResourceRepository {
     if (!m.matches()) {
       return string;
     }
-    Preconditions.checkState(m.groupCount() == 3, "Invalid groups %s found, 3 is expected.",
-        m.groupCount());
+    Preconditions.checkState(
+        m.groupCount() == 3, "Invalid groups %s found, 3 is expected.", m.groupCount());
 
     String bucketName = m.group(1);
     String objectKey = m.group(3);
@@ -115,8 +115,12 @@ public class GithubResourceRepository implements ResourceRepository {
         content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
       }
     }
-    String document = new JSONObject(content).getJSONObject("data").getJSONObject("repository")
-        .getJSONObject("content").getString("text");
+    String document =
+        new JSONObject(content)
+            .getJSONObject("data")
+            .getJSONObject("repository")
+            .getJSONObject("content")
+            .getString("text");
     try (InputStream in = new ByteArrayInputStream(document.getBytes(StandardCharsets.UTF_8))) {
       consumer.consume(in);
     }

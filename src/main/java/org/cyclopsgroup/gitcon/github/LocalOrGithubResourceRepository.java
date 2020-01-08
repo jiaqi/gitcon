@@ -22,8 +22,8 @@ public class LocalOrGithubResourceRepository implements ResourceRepository {
 
   private final ResourceRepository delegate;
 
-  public LocalOrGithubResourceRepository(String githubUser, String githubProject,
-      String accessToken) throws IOException {
+  public LocalOrGithubResourceRepository(
+      String githubUser, String githubProject, String accessToken) throws IOException {
     String type = System.getProperty("gitcon.type", "github");
     switch (type) {
       case "github":
