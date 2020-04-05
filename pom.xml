@@ -11,7 +11,7 @@
   <artifactId>gitcon</artifactId>
   <name>gitcon</name>
   <packaging>jar</packaging>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>0.0.2</version>
   <description>Git backened runtime config</description>
   <url>http://github.com/jiaqi/gitcon</url>
   <dependencies>
