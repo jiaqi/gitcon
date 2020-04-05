@@ -7,6 +7,15 @@ import org.cyclopsgroup.gitcon.FileSystemResourceRepository;
 import org.junit.Test;
 
 public class OmniResourceRepositoryTest {
+  private static GithubResourceRepository verifyNames(OmniResourceRepository repo,
+      String expectedUser, String expectedRepo) {
+    assertThat(repo.getDelegateRepository()).isInstanceOf(GithubResourceRepository.class);
+    GithubResourceRepository githubRepo = (GithubResourceRepository) repo.getDelegateRepository();
+    assertThat(githubRepo.getGithubUser()).isEqualTo(expectedUser);
+    assertThat(githubRepo.getRepositoryName()).isEqualTo(expectedRepo);
+    return githubRepo;
+  }
+
   @Test
   public void testFileRepository() throws IOException {
     OmniResourceRepository repo = new OmniResourceRepository("file:/tmp");
@@ -19,20 +28,14 @@ public class OmniResourceRepositoryTest {
   @Test
   public void testGithubRepositoryWithoutToken() throws IOException {
     OmniResourceRepository repo = new OmniResourceRepository("github.com:joe/johnson");
-    assertThat(repo.getDelegateRepository()).isInstanceOf(GithubResourceRepository.class);
-    GithubResourceRepository githubRepo = (GithubResourceRepository) repo.getDelegateRepository();
-    assertThat(githubRepo.getGithubUser()).isEqualTo("joe");
-    assertThat(githubRepo.getRepositoryName()).isEqualTo("johnson");
+    GithubResourceRepository githubRepo = verifyNames(repo, "joe", "johnson");
     assertThat(githubRepo.getAccessToken()).isEmpty();
   }
 
   @Test
   public void testGithubRepositoryWithToken() throws IOException {
     OmniResourceRepository repo = new OmniResourceRepository("github.com:joe/johnson@abc123");
-    assertThat(repo.getDelegateRepository()).isInstanceOf(GithubResourceRepository.class);
-    GithubResourceRepository githubRepo = (GithubResourceRepository) repo.getDelegateRepository();
-    assertThat(githubRepo.getGithubUser()).isEqualTo("joe");
-    assertThat(githubRepo.getRepositoryName()).isEqualTo("johnson");
+    GithubResourceRepository githubRepo = verifyNames(repo, "joe", "johnson");
     assertThat(githubRepo.getAccessToken()).isEqualTo("abc123");
   }
 }
