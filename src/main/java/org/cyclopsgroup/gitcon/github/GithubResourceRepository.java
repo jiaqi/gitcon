@@ -23,8 +23,6 @@ import org.json.JSONObject;
 
 /** Resource repository that read file from Github with GraphQL Github API V4. */
 public class GithubResourceRepository implements ResourceRepository {
-  private static final Pattern GCS_PATTERN = Pattern.compile("^gs://((\\w|-|\\.)+)/(.+)$");
-
   private class ResourceImpl extends Resource {
     private final String blobPath;
 
@@ -55,6 +53,8 @@ public class GithubResourceRepository implements ResourceRepository {
     }
   }
 
+  private static final Pattern GCS_PATTERN = Pattern.compile("^gs://((\\w|-|\\.)+)/(.+)$");
+
   private static String readGcsIfApplicable(String string) {
     Matcher m = GCS_PATTERN.matcher(string);
     if (!m.matches()) {
@@ -69,11 +69,11 @@ public class GithubResourceRepository implements ResourceRepository {
     return new String(storage.readAllBytes(bucketName, objectKey), StandardCharsets.UTF_8);
   }
 
+  private final String accessToken;
+  private final String bodyFormat;
   private String branchName = "master";
   private final String githubUser;
   private final String repositoryName;
-  private final String accessToken;
-  private final String bodyFormat;
 
   public GithubResourceRepository(String githubUser, String repositoryName, String accessToken)
       throws IOException {
@@ -84,17 +84,24 @@ public class GithubResourceRepository implements ResourceRepository {
         IOUtils.toString(getClass().getResource("get_blob_content.gql"), StandardCharsets.UTF_8);
   }
 
+  String getAccessToken() {
+    return accessToken;
+  }
+
+  String getGithubUser() {
+    return githubUser;
+  }
+
+  String getRepositoryName() {
+    return repositoryName;
+  }
+
   @Override
   public Resource getResource(String filePath) {
     if (filePath.startsWith("/")) {
       filePath = filePath.substring(1);
     }
     return new ResourceImpl(filePath);
-  }
-
-  /** @param branchName the branchName to set */
-  public void setBranchName(String branchName) {
-    this.branchName = branchName;
   }
 
   private void post(CheckedStreamConsumer consumer, String filePath)
@@ -124,5 +131,10 @@ public class GithubResourceRepository implements ResourceRepository {
     try (InputStream in = new ByteArrayInputStream(document.getBytes(StandardCharsets.UTF_8))) {
       consumer.consume(in);
     }
+  }
+
+  /** @param branchName the branchName to set */
+  public void setBranchName(String branchName) {
+    this.branchName = branchName;
   }
 }
