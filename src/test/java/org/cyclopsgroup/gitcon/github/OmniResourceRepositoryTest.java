@@ -1,14 +1,15 @@
 package org.cyclopsgroup.gitcon.github;
 
 import static com.google.common.truth.Truth.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 import org.cyclopsgroup.gitcon.FileSystemResourceRepository;
 import org.junit.Test;
 
 public class OmniResourceRepositoryTest {
-  private static GithubResourceRepository verifyNames(OmniResourceRepository repo,
-      String expectedUser, String expectedRepo) {
+  private static GithubResourceRepository verifyNames(
+      OmniResourceRepository repo, String expectedUser, String expectedRepo) {
     assertThat(repo.getDelegateRepository()).isInstanceOf(GithubResourceRepository.class);
     GithubResourceRepository githubRepo = (GithubResourceRepository) repo.getDelegateRepository();
     assertThat(githubRepo.getGithubUser()).isEqualTo(expectedUser);

@@ -1,5 +1,6 @@
 package org.cyclopsgroup.gitcon.github;
 
+import com.google.common.base.Strings;
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -7,7 +8,6 @@ import java.util.regex.Pattern;
 import org.cyclopsgroup.gitcon.FileSystemResourceRepository;
 import org.cyclopsgroup.gitcon.Resource;
 import org.cyclopsgroup.gitcon.ResourceRepository;
-import com.google.common.base.Strings;
 
 public class OmniResourceRepository implements ResourceRepository {
   private static final Pattern FILE_PATTERN = Pattern.compile("^file:(.+)$");
@@ -30,7 +30,8 @@ public class OmniResourceRepository implements ResourceRepository {
     Matcher m = pattern.matcher(string);
     if (m.matches() && m.groupCount() != groups) {
       throw new IllegalStateException(
-          String.format("Unexpected number of groups %s is found from input %s against pattern %s.",
+          String.format(
+              "Unexpected number of groups %s is found from input %s against pattern %s.",
               m.groupCount(), string, pattern));
     }
     return m;
@@ -51,4 +52,3 @@ public class OmniResourceRepository implements ResourceRepository {
     return repository;
   }
 }
-
