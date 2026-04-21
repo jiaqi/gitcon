@@ -102,6 +102,6 @@
     </repository>
   </distributionManagement>
   <properties>
-    <org.springframework.version>7.0.6</org.springframework.version>
+    <org.springframework.version>7.0.7</org.springframework.version>
   </properties>
 </project>
